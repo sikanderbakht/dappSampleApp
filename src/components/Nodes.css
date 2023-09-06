@@ -1,0 +1,32 @@
+.node-title {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+.container {
+  width: 100%;
+  overflow-x: auto; /* Enable horizontal scrolling if needed */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.node-table {
+  max-width: 100%; /* Set maximum width to 100% to cover the entire available space */
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #96d4d4;
+}
+
+th,
+td {
+  border: 1px solid white;
+  padding: 7px;
+  text-align: center;
+}
+
+th {
+  background-color: #ccc; /* Header background color */
+}

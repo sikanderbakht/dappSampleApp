@@ -1,0 +1,8 @@
+.container-fluid {
+  padding: 20px;
+}
+
+form {
+  max-width: 800px; /* Set a maximum width for the form */
+  margin: 0 auto; /* Center the form horizontally */
+}

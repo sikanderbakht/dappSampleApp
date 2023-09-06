@@ -1,107 +1,68 @@
-import { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ethers } from "ethers";
-import Greeter from "./artifacts/contracts/Greeter.sol/Greeter.json";
+import { useState, useEffect } from "react";
+import Greeter from "./artifacts/contracts/SupplyChain.sol/SupplyChain.json";
 import './App.css';
+import AddTransaction from "./pages/AddTransaction";
+import Home from "./pages/Home";
+import UpdateTransaction from './pages/UpdateTransaction';
 
-const greeterAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-// const ethers = require("ethers")
 function App() {
-  const [message, setMessage] = useState("");
-  const [currentGreeting, setCurrentGreeting] = useState("");
-
-  async function requestAccount() {
-    await window.ethereum.request({ method: "eth_requestAccounts" });
-  }
-
-  // Fetches the current value store in greeting
-  async function fetchGreeting() {
-    // If MetaMask exists
-    if (typeof window.ethereum !== "undefined") {
-      // const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const contract = new ethers.Contract(
-        greeterAddress,
-        Greeter.abi,
-        provider
-      );
+  const [etherState, setEtherState] = useState({
+    provider: null,
+    signer: null,
+    contract: null,
+  });
+  const [account, setAccount] = useState("None");
+  useEffect(() => {
+    const connectWallet = async () => {
+      const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+      const contractABI = Greeter.abi;
       try {
-        // Call Greeter.greet() and display current greeting in `console`
-        /* 
-          function greet() public view returns (string memory) {
-            return greeting;
-          }
-        */
-        const data = await contract.greet();
-        if (data === undefined || data === null || data === "") {
-          console.log("No greeting data found.");
+        const { ethereum } = window;
+
+        if (ethereum) {
+          const account = await ethereum.request({
+            method: "eth_requestAccounts",
+          });
+
+          window.ethereum.on("chainChanged", () => {
+            window.location.reload();
+          });
+
+          window.ethereum.on("accountsChanged", () => {
+            window.location.reload();
+          });
+          const provider = new ethers.BrowserProvider(ethereum);
+          const signer = await provider.getSigner();
+          const contract = new ethers.Contract(
+            contractAddress,
+            contractABI,
+            signer
+          );
+          setAccount(account);
+          setEtherState({ provider, signer, contract });
         } else {
-          console.log("data: ", data);
-          setCurrentGreeting(data);
+          alert("Please install metamask");
         }
       } catch (error) {
-        console.log("Error: ", error);
+        console.log(error);
       }
-    } else {
-      console.log("not found: ");
-    }
-  }
-
-  // // Sets the greeting from input text box
-  async function setGreeting() {
-    if (!message) return;
-
-    // If MetaMask exists
-    if (typeof window.ethereum !== "undefined") {
-      await requestAccount();
-
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-
-      // Create contract with signer
-      /*
-        function setGreeting(string memory _greeting) public {
-          console.log("Changing greeting from '%s' to '%s'", greeting, _greeting);
-          greeting = _greeting;
-        } 
-      */
-      const contract = new ethers.Contract(greeterAddress, Greeter.abi, signer);
-      const transaction = await contract.setGreeting(message);
-
-      setMessage("");
-      await transaction.wait();
-      fetchGreeting();
-    }
-  }
-
-
+    };
+    connectWallet();
+  }, []);
   return (
-    <div className="App">
-      <div className="App-header">
-        {/* DESCRIPTION  */}
-        <div className="description">
-          <h1>Greeter.sol</h1>
-          <h3>Full stack dapp using ReactJS and Hardhat</h3>
-        </div>
-        {/* BUTTONS - Fetch and Set */}
-        <div className="custom-buttons">
-          <button onClick={fetchGreeting} style={{ backgroundColor: "green" }}>
-            Fetch Greeting
-          </button>
-          <button onClick={setGreeting} style={{ backgroundColor: "red" }}>
-            Set Greeting
-          </button>
-        </div>
-        {/* INPUT TEXT - String  */}
-        <input
-          onChange={(e) => setMessage(e.target.value)}
-          value={message}
-          placeholder="Set Greeting Message"
-        />
-
-        {/* Current Value stored on Blockchain */}
-        <h2 className="greeting">Greeting: {currentGreeting}</h2>
+    <Router>
+      <div className="App">
+        
+        <Routes>
+          <Route path="/" element={<Home etherState={etherState}/>} />
+          <Route path="/add-transaction" element={<AddTransaction etherState={etherState}/>} />
+          <Route path="/update-transaction" element={<UpdateTransaction etherState={etherState}/>} />
+        </Routes>
       </div>
-    </div>
+    </Router>
+
   );
 }
 

@@ -1,0 +1,68 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh; /* Use min-height to ensure the container covers at least the screen height */
+  padding: 20px;
+  background-color: #f0f0f0;
+}
+
+.App-header {
+  width: 100%;
+  text-align: center;
+  margin: 0 auto; /* Center the content horizontally */
+}
+
+.description {
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 28px;
+  color: #333;
+}
+
+.subtitle {
+  font-size: 18px;
+  color: #666;
+}
+
+.select-field {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.custom-buttons {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.custom-button {
+  padding: 10px 20px;
+  margin: 0 10px; /* Add some horizontal spacing between buttons */
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.custom-button.primary {
+  background-color: green;
+}
+
+.custom-button.secondary {
+  background-color: #ccc;
+}
+
+.nodes-container {
+  width: 100%;
+  overflow-x: auto; /* Enable horizontal scrolling if needed */
+  margin-top: 20px;
+}
