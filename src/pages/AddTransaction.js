@@ -38,6 +38,11 @@ function AddTransaction({etherState}) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const temperature = parseFloat(nodeData.temperature);
+    if (temperature < 20 || temperature > 40) {
+      alert("Temperature must be a numeric value between 20 and 40.");
+      return;
+    }
     addNodeData();
     setNodeData({
       id: "",
@@ -87,7 +92,7 @@ function AddTransaction({etherState}) {
         <div className="form-group">
           <label>Temperature:</label>
           <input
-            type="text"
+            type="number"
             name="temperature"
             value={nodeData.temperature}
             onChange={handleChange}

@@ -6,38 +6,46 @@ import "./Home.css";
 
 const Home = ({ etherState }) => {
   const [nodes, setNodes] = useState([]);
-  const [selectedCity, setSelectedCity] = useState("");
+  const [sampeNode, setSampleNode] = useState("");
   const navigate = useNavigate();
 
-  const handleButtonClick = () => {
-    navigate("/update-transaction");
-  };
 
+  async function handleButtonClick() {
+    const { contract } = etherState;
+    try {
+      const isOwner = await contract.isOwner();
+      if (isOwner) {
+        navigate("/update-transaction");
+      } else {
+        alert("Error: Only the owner can call this function");
+      }
+    } catch(error) {
+      alert("Error: " + error);
+    }
+  };
 
   async function getNodes() {
     const { contract } = etherState;
     try {
-      const nodes = await contract.getFilteredNodeData(selectedCity);
-      // const nodes = await contract.getNodeData();
-      // await nodes.wait();
+      const nodes = await contract.getFilteredNodeData(sampeNode);
       console.log("nodes app: " + nodes);
       setNodes(nodes);
     } catch (error) {
-      alert("An error occurred while fetching data from the contract: " + "Only the owner can call this function");
+      alert("Error: Only the owner can call this function");
     }
   }
 
-  const citiesOfPakistan = [
-    "Karachi",
-    "Lahore",
-    "Islamabad",
-    "Rawalpindi",
-    "Faisalabad",
-    "Multan",
-    "Gujranwala",
-    "Peshawar",
-    "Quetta",
-    "Sialkot",
+  const sampleNodes = [
+    "Node1",
+    "Node2",
+    "Node3",
+    "Node4",
+    "Node5",
+    "Node6",
+    "Node7",
+    "Node8",
+    "Node9",
+    "Node10",
   ];
   return (
     <div className="App">
@@ -48,12 +56,12 @@ const Home = ({ etherState }) => {
         </div>
 
         <select
-          onChange={(e) => setSelectedCity(e.target.value)}
-          value={selectedCity}
+          onChange={(e) => setSampleNode(e.target.value)}
+          value={sampeNode}
           className="select-field"
         >
-          <option value="">Select a City</option>
-          {citiesOfPakistan.map((city) => (
+          <option value="">Select a Node</option>
+          {sampleNodes.map((city) => (
             <option key={city} value={city}>
               {city}
             </option>

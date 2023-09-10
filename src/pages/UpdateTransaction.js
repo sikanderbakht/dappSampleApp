@@ -48,6 +48,11 @@ function UpdateTransaction({ etherState }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const temperature = parseFloat(nodeData.temperature);
+    if (temperature < 20 || temperature > 40) {
+      alert("Temperature must be a numeric value between 20 and 40.");
+      return;
+    }
     updateNodeData();
     setNodeData({
       id: "",
@@ -100,7 +105,7 @@ function UpdateTransaction({ etherState }) {
         <div className="form-group">
           <label htmlFor="temperature">Temperature:</label>
           <input
-            type="text"
+            type="number"
             id="temperature"
             name="temperature"
             value={nodeData.temperature}

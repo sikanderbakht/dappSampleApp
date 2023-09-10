@@ -14,19 +14,34 @@ contract SupplyChain {
         string weight;
         string rfid;
         address nodeAddress;
+        uint256 timestamp;
     }
 
     NodeData[] nodes;
     address public owner;
+    address public reader;
+
+    modifier onlyOwnerOrReader() {
+        require(
+            msg.sender == owner || msg.sender == reader,
+            "Only the owner or reader can call this function"
+        );
+        _;
+    }
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Only the owner can call this function");
         _;
     }
 
+    modifier onlyReader() {
+        require(msg.sender == reader, "Only the owner can call this function");
+        _;
+    }
+
     constructor() {
         owner = msg.sender;
-
+        reader = 0x70997970C51812dc3A010C7d01b50e0d17dc79C8;
         nodes.push(
             NodeData(
                 "Node1",
@@ -36,7 +51,8 @@ contract SupplyChain {
                 "60%",
                 "10kg",
                 "RFID123",
-                msg.sender
+                msg.sender,
+                block.timestamp
             )
         );
         nodes.push(
@@ -48,7 +64,8 @@ contract SupplyChain {
                 "55%",
                 "8kg",
                 "RFID456",
-                msg.sender
+                msg.sender,
+                block.timestamp
             )
         );
         nodes.push(
@@ -60,7 +77,8 @@ contract SupplyChain {
                 "70%",
                 "12kg",
                 "RFID789",
-                msg.sender
+                msg.sender,
+                block.timestamp
             )
         );
         nodes.push(
@@ -72,7 +90,8 @@ contract SupplyChain {
                 "65%",
                 "11kg",
                 "RFID101",
-                msg.sender
+                msg.sender,
+                block.timestamp
             )
         );
         nodes.push(
@@ -84,7 +103,8 @@ contract SupplyChain {
                 "75%",
                 "9kg",
                 "RFID202",
-                msg.sender
+                msg.sender,
+                block.timestamp
             )
         );
         nodes.push(
@@ -96,7 +116,8 @@ contract SupplyChain {
                 "80%",
                 "15kg",
                 "RFID303",
-                msg.sender
+                msg.sender,
+                block.timestamp
             )
         );
         nodes.push(
@@ -108,7 +129,8 @@ contract SupplyChain {
                 "63%",
                 "13kg",
                 "RFID404",
-                msg.sender
+                msg.sender,
+                block.timestamp
             )
         );
         nodes.push(
@@ -120,7 +142,8 @@ contract SupplyChain {
                 "68%",
                 "14kg",
                 "RFID505",
-                msg.sender
+                msg.sender,
+                block.timestamp
             )
         );
         nodes.push(
@@ -132,7 +155,8 @@ contract SupplyChain {
                 "72%",
                 "16kg",
                 "RFID606",
-                msg.sender
+                msg.sender,
+                block.timestamp
             )
         );
         nodes.push(
@@ -144,79 +168,8 @@ contract SupplyChain {
                 "67%",
                 "17kg",
                 "RFID707",
-                msg.sender
-            )
-        );
-        nodes.push(
-            NodeData(
-                "Node11",
-                "Lucas Harris",
-                "Quetta",
-                "31\u00b0C",
-                "71%",
-                "18kg",
-                "RFID808",
-                msg.sender
-            )
-        );
-        nodes.push(
-            NodeData(
-                "Node12",
-                "Sarah Miller",
-                "Rawalpindi",
-                "29\u00b0C",
-                "58%",
-                "11kg",
-                "RFID909",
-                msg.sender
-            )
-        );
-        nodes.push(
-            NodeData(
-                "Node13",
-                "Michael Johnson",
-                "Lahore",
-                "20\u00b0C",
-                "62%",
-                "9.5kg",
-                "RFID010",
-                msg.sender
-            )
-        );
-        nodes.push(
-            NodeData(
-                "Node14",
-                "Emily Davis",
-                "Karachi",
-                "27\u00b0C",
-                "64%",
-                "11.5kg",
-                "RFID111",
-                msg.sender
-            )
-        );
-        nodes.push(
-            NodeData(
-                "Node15",
-                "Daniel Clark",
-                "Faisalabad",
-                "24\u00b0C",
-                "66%",
-                "10.8kg",
-                "RFID212",
-                msg.sender
-            )
-        );
-        nodes.push(
-            NodeData(
-                "Node16",
-                "Sophia Anderson",
-                "Multan",
-                "23\u00b0C",
-                "59%",
-                "12.2kg",
-                "RFID313",
-                msg.sender
+                msg.sender,
+                block.timestamp
             )
         );
     }
@@ -230,6 +183,20 @@ contract SupplyChain {
         string memory weight,
         string memory rfid
     ) public {
+        bool nodeExists = false;
+
+        for (uint256 i = 0; i < nodes.length; i++) {
+            if (
+                keccak256(abi.encodePacked(bytes(nodes[i].id))) ==
+                keccak256(abi.encodePacked(bytes(id)))
+            ) {
+                nodeExists = true;
+                break;
+            }
+        }
+
+        require(nodeExists, "Node with the given id does not exist");
+
         nodes.push(
             NodeData(
                 id,
@@ -239,7 +206,8 @@ contract SupplyChain {
                 humidity,
                 weight,
                 rfid,
-                msg.sender
+                msg.sender,
+                block.timestamp
             )
         );
     }
@@ -249,14 +217,14 @@ contract SupplyChain {
     }
 
     function getFilteredNodeData(
-        string memory targetLocation
-    ) public view onlyOwner returns (NodeData[] memory) {
+        string memory targetNode
+    ) public view onlyOwnerOrReader returns (NodeData[] memory) {
         uint256 count = 0;
 
         for (uint256 i = 0; i < nodes.length; i++) {
             if (
-                keccak256(abi.encodePacked(bytes(nodes[i].location))) ==
-                keccak256(abi.encodePacked(bytes(targetLocation)))
+                keccak256(abi.encodePacked(bytes(nodes[i].id))) ==
+                keccak256(abi.encodePacked(bytes(targetNode)))
             ) {
                 count++;
             }
@@ -267,8 +235,8 @@ contract SupplyChain {
 
         for (uint256 i = 0; i < nodes.length; i++) {
             if (
-                keccak256(abi.encodePacked(bytes(nodes[i].location))) ==
-                keccak256(abi.encodePacked(bytes(targetLocation)))
+                keccak256(abi.encodePacked(bytes(nodes[i].id))) ==
+                keccak256(abi.encodePacked(bytes(targetNode)))
             ) {
                 result[currentIndex] = nodes[i];
                 currentIndex++;
@@ -287,24 +255,36 @@ contract SupplyChain {
         string memory weight,
         string memory rfid
     ) public onlyOwner {
-        bool nodeFound = false;
+        bool nodeExists = false;
 
         for (uint256 i = 0; i < nodes.length; i++) {
             if (
                 keccak256(abi.encodePacked(bytes(nodes[i].id))) ==
                 keccak256(abi.encodePacked(bytes(id)))
             ) {
-                nodes[i].name = name;
-                nodes[i].location = location;
-                nodes[i].temperature = temperature;
-                nodes[i].humidity = humidity;
-                nodes[i].weight = weight;
-                nodes[i].rfid = rfid;
-                nodeFound = true;
+                nodeExists = true;
                 break;
             }
         }
 
-        require(nodeFound, "Node not found");
+        require(nodeExists, "Node with the given id does not exist");
+
+        nodes.push(
+            NodeData(
+                id,
+                name,
+                location,
+                temperature,
+                humidity,
+                weight,
+                rfid,
+                msg.sender,
+                block.timestamp
+            )
+        );
+    }
+
+    function isOwner() public view returns (bool) {
+        return msg.sender == owner;
     }
 }
